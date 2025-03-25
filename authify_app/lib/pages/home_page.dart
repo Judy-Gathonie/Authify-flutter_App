@@ -1,6 +1,8 @@
 import 'package:authify_app/utils/animations/login_page_animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import '../utils/animations/page_routes/slide_page_route.dart';
+import '../pages/login_page.dart';
 
 class AnimatedHomePage extends StatefulWidget {
   @override
@@ -123,6 +125,12 @@ class _HomePage extends StatelessWidget {
           style: TextStyle(
               fontSize: 16, color: _primaryColor, fontWeight: FontWeight.bold),
         ),
-        onPressed: () {});
+        onPressed: () {
+          Navigator.push(
+            _context,
+            SlidePageRoute(AnimatedLoginPage(),
+            )
+          );
+        });
   }
 }
