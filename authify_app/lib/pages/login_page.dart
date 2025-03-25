@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'package:flutter/material.dart';
 import '../utils/animations/login_page_animations.dart';
+import '../utils/animations/page_routes/fade_page_route.dart';
 
 class AnimatedLoginPage extends StatefulWidget {
   @override
@@ -20,7 +21,7 @@ class _AnimatedLoginPageState extends State<AnimatedLoginPage>
     super.initState();
     controller = AnimationController(
         vsync: this,
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 1),
         reverseDuration: Duration(milliseconds: 400));
   }
 
@@ -47,7 +48,7 @@ class _loginPage extends StatelessWidget {
 
   late EnterAnimation _animation;
   late AnimationController controller;
-  _loginPage(AnimationController controller) {
+  _loginPage(this.controller) {
     controller = controller;
     _animation = EnterAnimation(controller);
     controller.forward();
@@ -154,18 +155,9 @@ class _loginPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25.0),
           side: BorderSide(color: Colors.white)),
-      onPressed: () {
-        Navigator.pushReplacement(_context, PageRouteBuilder(
-            transitionDuration:Duration(seconds: 2),
-            transitionsBuilder:( BuildContext _context,Animation<double> animation, Animation<double>secondanimation , Widget child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-                );
-            },
-            pageBuilder: (BuildContext _context, animation, secondAnimation) {
-          return HomePage();
-        }));
+      onPressed: () async {
+        await controller.reverse();
+        Navigator.pushReplacement(_context, FadePageRoute(AnimatedHomePage()));
       },
       child: Text(
         "Log In",
