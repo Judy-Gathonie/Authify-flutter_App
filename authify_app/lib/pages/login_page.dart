@@ -1,6 +1,43 @@
+import 'package:authify_app/utils/animations/login_page_animations.dart';
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'package:flutter/material.dart';
+import '../utils/animations/login_page_animations.dart';
 
-class loginPage extends StatelessWidget {
+class AnimatedLoginPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _AnimatedLoginPageState();
+  }
+}
+
+class _AnimatedLoginPageState extends State<AnimatedLoginPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: 2),
+        reverseDuration: Duration(milliseconds: 400));
+  }
+
+  @override
+  void dispose() {
+    //implement dispose for _controller function
+    super.dispose();
+    controller.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _loginPage(controller);
+  }
+}
+
+class _loginPage extends StatelessWidget {
   late double _deviceHeight;
   late double _deviceWidth;
 
@@ -8,6 +45,13 @@ class loginPage extends StatelessWidget {
 
   Color _secondaryColor = Color.fromRGBO(169, 224, 241, 1.0);
 
+  late EnterAnimation _animation;
+  late AnimationController controller;
+  _loginPage(AnimationController controller) {
+    controller = controller;
+    _animation = EnterAnimation(controller);
+    controller.forward();
+  }
   @override
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
@@ -34,7 +78,7 @@ class loginPage extends StatelessWidget {
                   SizedBox(
                     height: _deviceHeight * 0.10,
                   ),
-                  _loginButton(),
+                  _loginButton(context),
                 ],
               ),
             )));
@@ -42,14 +86,24 @@ class loginPage extends StatelessWidget {
 
   Widget _avatarWidget() {
     double _circleD = _deviceHeight * 0.25;
-    return Container(
-      height: _circleD,
-      width: _circleD,
-      decoration: BoxDecoration(
-          color: _secondaryColor,
-          borderRadius: BorderRadius.circular(500),
-          image: DecorationImage(
-              image: AssetImage('asssets/images/main_avatar.png'))),
+    return AnimatedBuilder(
+      animation: _animation.controller,
+      builder: (BuildContext context, Widget? child) {
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.diagonal3Values(
+              _animation.circlesize.value, _animation.circlesize.value, 1),
+          child: Container(
+            height: _circleD,
+            width: _circleD,
+            decoration: BoxDecoration(
+                color: _secondaryColor,
+                borderRadius: BorderRadius.circular(500),
+                image: DecorationImage(
+                    image: AssetImage('asssets/images/main_avatar.png'))),
+          ),
+        );
+      },
     );
   }
 
@@ -92,20 +146,31 @@ class loginPage extends StatelessWidget {
         ));
   }
 
-  Widget _loginButton() {
+  Widget _loginButton(BuildContext _context) {
     return MaterialButton(
       minWidth: _deviceWidth * 0.38,
       height: _deviceHeight * 0.055,
       color: Colors.white,
-            
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25.0),
           side: BorderSide(color: Colors.white)),
-      onPressed: null,
+      onPressed: () {
+        Navigator.pushReplacement(_context, PageRouteBuilder(
+            transitionDuration:Duration(seconds: 2),
+            transitionsBuilder:( BuildContext _context,Animation<double> animation, Animation<double>secondanimation , Widget child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+                );
+            },
+            pageBuilder: (BuildContext _context, animation, secondAnimation) {
+          return HomePage();
+        }));
+      },
       child: Text(
         "Log In",
         style: TextStyle(
-            fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+            fontSize: 16, color: _primaryColor, fontWeight: FontWeight.bold),
       ),
     );
   }
